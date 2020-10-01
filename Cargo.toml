@@ -28,6 +28,7 @@ bench = false
 debug = true
 
 [dependencies]
+fxhash = "0.2.1"
 fixedbitset = { version = "0.3.0", default-features = false }
 quickcheck = { optional = true, version = "0.8", default-features = false }
 indexmap = { version = "1.0.2" }

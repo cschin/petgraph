@@ -21,6 +21,11 @@ use crate::visit::{IntoEdgeReferences, IntoEdges, NodeCompactIndexable};
 use crate::visit::{IntoNodeIdentifiers, IntoNodeReferences, NodeCount, NodeIndexable};
 use crate::IntoWeightedEdge;
 
+
+use fxhash::FxBuildHasher;
+type FxIndexMap<K, V> = IndexMap<K, V, FxBuildHasher>;
+
+
 /// A `GraphMap` with undirected edges.
 ///
 /// For example, an edge between *1* and *2* is equivalent to an edge between
@@ -58,8 +63,8 @@ pub type DiGraphMap<N, E> = GraphMap<N, E, Directed>;
 /// Depends on crate feature `graphmap` (default).
 #[derive(Clone)]
 pub struct GraphMap<N, E, Ty> {
-    nodes: IndexMap<N, Vec<(N, CompactDirection)>>,
-    edges: IndexMap<(N, N), E>,
+    nodes: FxIndexMap<N, Vec<(N, CompactDirection)>>,
+    edges: FxIndexMap<(N, N), E>,
     ty: PhantomData<Ty>,
 }
 
@@ -108,8 +113,8 @@ where
     /// Create a new `GraphMap` with estimated capacity.
     pub fn with_capacity(nodes: usize, edges: usize) -> Self {
         GraphMap {
-            nodes: IndexMap::with_capacity(nodes),
-            edges: IndexMap::with_capacity(edges),
+            nodes: FxIndexMap::with_capacity_and_hasher(nodes, FxBuildHasher::default()),
+            edges: FxIndexMap::with_capacity_and_hasher(edges, FxBuildHasher::default()),
             ty: PhantomData,
         }
     }
@@ -553,7 +558,7 @@ where
     Ty: EdgeType,
 {
     from: N,
-    edges: &'a IndexMap<(N, N), E>,
+    edges: &'a FxIndexMap<(N, N), E>,
     iter: Neighbors<'a, N, Ty>,
 }
 
